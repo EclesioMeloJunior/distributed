@@ -1,0 +1,8 @@
+[global]
+basepath='~/.distributed/testnet'
+bootnode=true
+
+[network]
+bootnodes=[]
+ip="127.0.0.1"
+port=90091
