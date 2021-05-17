@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 )
 
 const defaultConfigPath = "./config.toml"
@@ -23,9 +24,8 @@ func main() {
 		panic(err)
 	}
 
-	if c.Global.Bootnode {
-		setupBootnode(c)
-	} else {
-		setupNode(c)
+	err = setupNode(c)
+	if err != nil {
+		log.Printf("could not setup node: %v", err)
 	}
 }

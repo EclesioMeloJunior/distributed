@@ -9,13 +9,11 @@ import (
 type (
 	Global struct {
 		Basepath string `toml:"basepath"`
-		Bootnode bool   `toml:"bootnode"`
 	}
 
 	Network struct {
-		Bootnodes []string `toml:"bootnodes"`
-		IP        string   `toml:"ip"`
-		Port      int      `toml:"port"`
+		IP   string `toml:"ip"`
+		Port int    `toml:"port"`
 	}
 
 	Config struct {

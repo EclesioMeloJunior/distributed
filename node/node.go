@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/boltdb/bolt"
@@ -47,7 +48,19 @@ func (n *Node) FindClosest(peer *Node) ([]*Node, error) {
 }
 
 func NewNode(ip net.IP, port int, basepath string) (*Node, error) {
-	database, err := bolt.Open(filepath.Join(basepath, "register.db"), os.ModePerm, nil)
+	dbpath, err := expandHomeDirectory(filepath.Join(basepath, "register.db"))
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = os.Stat(dbpath)
+	if err != nil {
+		if err = createDefaultDirectory(basepath); err != nil {
+			return nil, err
+		}
+	}
+
+	database, err := bolt.Open(dbpath, os.ModePerm, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -62,4 +75,26 @@ func NewNode(ip net.IP, port int, basepath string) (*Node, error) {
 		basepath: basepath,
 		database: database,
 	}, nil
+}
+
+func createDefaultDirectory(dir string) error {
+	expandedDir, err := expandHomeDirectory(dir)
+	if err != nil {
+		return err
+	}
+
+	return os.MkdirAll(expandedDir, os.ModeDir)
+}
+
+func expandHomeDirectory(dir string) (string, error) {
+	if strings.HasPrefix(dir, "~") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+
+		dir = strings.Replace(dir, "~", home, -1)
+	}
+
+	return dir, nil
 }
